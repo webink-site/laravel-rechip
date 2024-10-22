@@ -10,22 +10,40 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Проверка кода
+      # Шаг 1: Проверка кода
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Настройка SSH
+      # Шаг 2: Настройка SSH Agent
+      - name: Setup SSH Agent
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Копирование файлов на сервер
+      # Шаг 3: Добавление хоста в known_hosts
+      - name: Add server to known_hosts
         run: |
-          rsync -avr --exclude='.git' --exclude='storage/logs' --exclude='node_modules' --exclude='vendor' ./ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/var/www/api.rechip-tuning.ru/
-      
-      - name: Выполнение команд на сервере
+          mkdir -p ~/.ssh
+          ssh-keyscan -p ${{ secrets.SSH_PORT }} ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+          # Опционально, можно проверить добавленный ключ
+          cat ~/.ssh/known_hosts
+
+      # Шаг 4: Установка rsync
+      - name: Install rsync
+        run: sudo apt-get update && sudo apt-get install -y rsync
+
+      # Шаг 5: Копирование файлов на сервер
+      - name: Copy files to server
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
-            cd /var/www/api.rechip-tuning.ru/
+          rsync -avr --exclude='.git' --exclude='storage/logs' --exclude='node_modules' --exclude='vendor' ./ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/path/to/your/project/
+        env:
+          RSYNC_RSH: "ssh -p ${{ secrets.SSH_PORT }}"
+
+      # Шаг 6: Выполнение команд на сервере
+      - name: Deploy commands
+        run: |
+          ssh -p ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+            cd /path/to/your/project/
             docker-compose pull
             docker-compose up -d --build
             docker-compose exec app composer install --prefer-dist --no-dev --optimize-autoloader
