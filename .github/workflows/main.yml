@@ -16,7 +16,7 @@ jobs:
 
       # Шаг 2: Настройка SSH Agent
       - name: Setup SSH Agent
-        uses: webfactory/ssh-agent@v0.9.0
+        uses: webfactory/ssh-agent@v0.5.4  # Убедитесь, что используете существующую версию
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
@@ -25,25 +25,41 @@ jobs:
         run: |
           mkdir -p ~/.ssh
           ssh-keyscan -p ${{ secrets.SSH_PORT }} ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
-          # Опционально, можно проверить добавленный ключ
-          cat ~/.ssh/known_hosts
 
       # Шаг 4: Установка rsync
       - name: Install rsync
         run: sudo apt-get update && sudo apt-get install -y rsync
 
-      # Шаг 5: Копирование файлов на сервер
+      # Шаг 5: Копирование файлов на сервер (исключая .env)
       - name: Copy files to server
         run: |
-          rsync -avr --exclude='.git' --exclude='storage/logs' --exclude='node_modules' --exclude='vendor' ./ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/var/www/api.rechip-tuning.ru
+          rsync -avr --exclude='.git' --exclude='storage/logs' --exclude='node_modules' --exclude='vendor' --exclude='.env' ./ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/path/to/your/project/
         env:
           RSYNC_RSH: "ssh -p ${{ secrets.SSH_PORT }}"
 
-      # Шаг 6: Выполнение команд на сервере
+      # Шаг 6: Создание или обновление файла .env на сервере
+      - name: Update .env on server
+        run: |
+          ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "cat > /path/to/your/project/.env" <<EOF
+APP_ENV=production
+APP_DEBUG=false
+APP_KEY=${{ secrets.APP_KEY }}
+APP_TIMEZONE=${{ secrets.APP_TIMEZONE }}
+DB_CONNECTION=pgsql
+DB_HOST=postgres_rechip
+DB_PORT=5432
+DB_DATABASE=${{ secrets.DB_DATABASE }}
+DB_USERNAME=${{ secrets.DB_USERNAME }}
+DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+REDIS_HOST=redis_rechip
+REDIS_PORT=6379
+EOF
+
+      # Шаг 7: Выполнение команд на сервере
       - name: Deploy commands
         run: |
           ssh -p ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
-            cd /var/www/api.rechip-tuning.ru
+            cd /path/to/your/project/
             docker-compose pull
             docker-compose up -d --build
             docker-compose exec app composer install --prefer-dist --no-dev --optimize-autoloader
