@@ -1,0 +1,62 @@
+version: '3.7'
+
+services:
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: laravel_app_rechip
+        restart: unless-stopped
+        environment:
+            - APP_ENV=local
+            - APP_DEBUG=true
+            - APP_KEY=${APP_KEY}
+            - DB_CONNECTION=pgsql
+            - DB_HOST=postgres_rechip
+            - DB_PORT=5432
+            - DB_DATABASE=${DB_DATABASE}
+            - DB_USERNAME=${DB_USERNAME}
+            - DB_PASSWORD=${DB_PASSWORD}
+            - REDIS_HOST=redis_rechip
+            - REDIS_PORT=6379
+        volumes:
+            - .:/var/www/html
+        networks:
+            - app-network
+        ports:
+            - "8000:8000"
+        depends_on:
+            - postgres_rechip
+            - redis_rechip
+
+    postgres_rechip:
+        image: postgres:latest
+        container_name: postgres_db_rechip
+        restart: unless-stopped
+        environment:
+            POSTGRES_USER: ${DB_USERNAME}
+            POSTGRES_PASSWORD: ${DB_PASSWORD}
+            POSTGRES_DB: ${DB_DATABASE}
+        volumes:
+            - pgdata_rechip:/var/lib/postgresql/data
+        networks:
+            - app-network
+        ports:
+            - "5432:5432"
+        command: [ "postgres", "-c", "wal_level=logical" ]
+
+    redis_rechip:
+        image: redis:latest
+        container_name: redis_server_rechip
+        restart: unless-stopped
+        networks:
+            - app-network
+        ports:
+            - "6379:6379"
+
+networks:
+    app-network:
+        driver: bridge
+
+volumes:
+    pgdata_rechip:
