@@ -33,14 +33,14 @@ RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - && \
     apt-get install -y nodejs && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Установка рабочего каталога
+# Настройка рабочей директории
 WORKDIR /var/www/html
 
 # Копирование файлов проекта
 COPY . .
 
 # Установка зависимостей Laravel и компиляция ассетов
-RUN composer install --prefer-dist --no-scripts --no-autoloader && \
+RUN composer install --prefer-dist --no-dev --optimize-autoloader && \
     composer dump-autoload --optimize
 
 # Выполнение команд Artisan для оптимизации

@@ -19,8 +19,6 @@ services:
             - DB_PASSWORD=${DB_PASSWORD}
             - REDIS_HOST=redis_rechip
             - REDIS_PORT=6379
-        volumes:
-            - .:/var/www/html
         networks:
             - app-network
         ports:
