@@ -23,6 +23,7 @@ services:
             - app-network
         volumes:
             - .:/var/www/html
+            - vendor:/var/www/html/vendor
         ports:
             - "8000:8000"
         depends_on:
@@ -60,3 +61,4 @@ networks:
 
 volumes:
     pgdata_rechip:
+    vendor:

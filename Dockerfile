@@ -1,6 +1,6 @@
 FROM php:8.2-fpm
 
-# Обновляем информацию о пакетах и устанавливаем системные зависимости
+# Установка системных зависимостей
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     npm \
@@ -15,7 +15,7 @@ RUN apt-get update && \
     libxml2-dev \
     libpq-dev
 
-# Конфигурируем и устанавливаем расширения PHP
+# Конфигурирование и установка PHP расширений
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
     docker-php-ext-install -j$(nproc) gd mbstring pdo pdo_pgsql bcmath xml zip sockets pcntl intl
 
@@ -40,7 +40,7 @@ WORKDIR /var/www/html
 COPY . .
 
 # Установка зависимостей Laravel и компиляция ассетов
-RUN composer install --prefer-dist --no-dev --optimize-autoloader && \
+RUN composer install --prefer-dist --no-scripts --no-dev && \
     composer dump-autoload --optimize
 
 # Выполнение команд Artisan для оптимизации
