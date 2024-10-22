@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+    'avito' => [
+        'client_id' => env('AVITO_CLIENT_ID'),
+        'client_secret' => env('AVITO_CLIENT_SECRET'),
+        'token_url' => env('AVITO_TOKEN_URL'),
+        'reviews_url' => env('AVITO_REVIEWS_URL'),
+    ],
+
 ];
