@@ -1,12 +1,19 @@
 <?php
+namespace App\Providers;
+
 use App\Filament\Pages\TelegramSettingsPage;
 use Filament\Facades\Filament;
+use Illuminate\Support\ServiceProvider;
 
-public function boot()
+
+class FilamentServiceProvider extends ServiceProvider
 {
-    Filament::serving(function () {
-        Filament::registerPages([
-            TelegramSettingsPage::class,
-        ]);
-    });
+    public function boot()
+    {
+        Filament::serving(function () {
+            Filament::registerPages([
+                TelegramSettingsPage::class,
+            ]);
+        });
+    }
 }
