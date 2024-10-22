@@ -35,7 +35,7 @@ jobs:
       # Шаг 5: Копирование файлов на сервер
       - name: Copy files to server
         run: |
-          rsync -avr --exclude='.git' --exclude='storage/logs' --exclude='node_modules' --exclude='vendor' ./ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/path/to/your/project/
+          rsync -avr --exclude='.git' --exclude='storage/logs' --exclude='node_modules' --exclude='vendor' ./ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/var/www/api.rechip-tuning.ru
         env:
           RSYNC_RSH: "ssh -p ${{ secrets.SSH_PORT }}"
 
@@ -43,7 +43,7 @@ jobs:
       - name: Deploy commands
         run: |
           ssh -p ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
-            cd /path/to/your/project/
+            cd /var/www/api.rechip-tuning.ru
             docker-compose pull
             docker-compose up -d --build
             docker-compose exec app composer install --prefer-dist --no-dev --optimize-autoloader
