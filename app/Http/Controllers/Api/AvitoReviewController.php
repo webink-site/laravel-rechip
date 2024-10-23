@@ -65,7 +65,7 @@ class AvitoReviewController extends Controller
 
             if ($response->successful()) {
                 $data = $response->json();
-                Log::info("Avito token responce:" . $data);
+                Log::info($data);
                 return $data['access_token'] ?? null;
             }
 
