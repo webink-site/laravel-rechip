@@ -53,7 +53,7 @@ class TelegramSettings extends Page implements Forms\Contracts\HasForms
     public function setWebhook()
     {
         $telegram = new TelegramApi(config('telegram.bot_token'));
-        $webhookUrl = config('app.url') . '/telegram/webhook';
+        $webhookUrl = config('app.url') . '/api/telegram/webhook';
 
         $response = $telegram->setWebhook(['url' => $webhookUrl]);
 
