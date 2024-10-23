@@ -5,6 +5,7 @@ namespace App\Filament\Pages;
 use Filament\Pages\Page;
 use Filament\Forms;
 use Filament\Notifications\Notification;
+use Illuminate\Support\Facades\Log;
 use Telegram\Bot\Api as TelegramApi;
 use App\Models\TelegramSetting;
 
@@ -55,6 +56,8 @@ class TelegramSettings extends Page implements Forms\Contracts\HasForms
         $webhookUrl = config('app.url') . '/telegram/webhook';
 
         $response = $telegram->setWebhook(['url' => $webhookUrl]);
+
+        Log::info("Set Telegram webhook: " . $response);
 
         if ($response) {
             Notification::make()
