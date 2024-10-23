@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\TelegramRequest;
 use App\Models\TelegramUser;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Telegram\Bot\Api as TelegramApi;
 
 class TelegramWebhookController extends Controller
@@ -19,6 +20,7 @@ class TelegramWebhookController extends Controller
     public function handleWebhook(Request $request)
     {
         $update = $this->telegram->getWebhookUpdates();
+        Log::info("Telegram update: ". $update);
 
         if ($update->isType('callback_query')) {
             $callback = $update->getCallbackQuery();

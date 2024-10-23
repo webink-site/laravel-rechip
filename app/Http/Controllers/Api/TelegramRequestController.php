@@ -86,63 +86,6 @@ class TelegramRequestController extends Controller
         return response()->json(['status' => 'success'], 200);
     }
 
-    public function handleCallback(Request $request)
-    {
-        $callbackQuery = $request->input('callback_query');
-        if (isset($callbackQuery)) {
-            $data = $callbackQuery['data'];
-            $chatId = $callbackQuery['message']['chat']['id'];
-            $messageId = $callbackQuery['message']['message_id'];
-
-            if (strpos($data, 'spam_') === 0) {
-                $requestId = intval(str_replace('spam_', '', $data));
-                $this->handleSpamRequest($requestId, $chatId, $messageId);
-            } elseif (strpos($data, 'completed_') === 0) {
-                $requestId = intval(str_replace('completed_', '', $data));
-                $this->handleCompletedRequest($requestId, $chatId, $messageId);
-            }
-        }
-    }
-
-    private function handleSpamRequest($requestId, $chatId, $messageId)
-    {
-        $telegramRequest = TelegramRequest::find($requestId);
-        if ($telegramRequest) {
-            $telegramRequest->status = 'spam';
-            $telegramRequest->save();
-
-            // Удаление сообщения
-            $this->telegram->deleteMessage([
-                'chat_id' => $chatId,
-                'message_id' => $messageId,
-            ]);
-        }
-    }
-
-    private function handleCompletedRequest($requestId, $chatId, $messageId)
-    {
-        $telegramRequest = TelegramRequest::find($requestId);
-        if ($telegramRequest) {
-            $telegramRequest->status = 'completed';
-            $telegramRequest->save();
-
-            // Обновление сообщения
-            $text = "<b>Контакт: </b>" . e($telegramRequest->contact) . "\n";
-            if ($telegramRequest->product) {
-                $text .= "<b>Продукт: </b>" . e($telegramRequest->product) . "\n";
-            }
-            $text .= e($telegramRequest->request_data);
-            $message = "✅ <b>Заявка #{$requestId} отработана!</b>\n" . $text;
-
-            $this->telegram->editMessageText([
-                'chat_id' => $chatId,
-                'message_id' => $messageId,
-                'text' => $message,
-                'parse_mode' => 'HTML',
-            ]);
-        }
-    }
-
     private function decodeUnicode($str)
     {
         return preg_replace_callback('/\\\\u([0-9a-fA-F]{4})/', function ($matches) {
