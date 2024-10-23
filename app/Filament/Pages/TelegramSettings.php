@@ -56,7 +56,7 @@ class TelegramSettings extends Page implements Forms\Contracts\HasForms
 
         $response = $telegram->setWebhook(['url' => $webhookUrl]);
 
-        if ($response->getOk()) {
+        if ($response) {
             Notification::make()
                 ->title('Webhook установлен успешно!')
                 ->success()
@@ -64,7 +64,7 @@ class TelegramSettings extends Page implements Forms\Contracts\HasForms
         } else {
             Notification::make()
                 ->title('Ошибка установки webhook')
-                ->body($response->getDescription())
+                ->body($response)
                 ->danger()
                 ->send();
         }
