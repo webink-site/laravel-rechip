@@ -52,6 +52,10 @@ class AvitoReviewController extends Controller
     private function getAccessToken(): ?string
     {
         // Используем кэширование для хранения токена на время его жизни
+        $token_url = config('services.avito.token_url');
+        $client_id = config('services.avito.client_id');
+        $client_secret = config('services.avito.client_secret');
+
         return Cache::remember('avito_access_token', 3600, function () {
             $response = Http::asForm()->post(config('services.avito.token_url'), [
                 'grant_type' => 'client_credentials',
@@ -61,6 +65,7 @@ class AvitoReviewController extends Controller
 
             if ($response->successful()) {
                 $data = $response->json();
+                Log::info("Avito token responce:" . $data);
                 return $data['access_token'] ?? null;
             }
 
