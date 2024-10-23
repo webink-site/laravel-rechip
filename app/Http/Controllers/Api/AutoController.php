@@ -137,8 +137,8 @@ class AutoController extends Controller
         $data = $response->json();
 
         // Поиск модификации, соответствующей product_id
-        foreach ($data as $car) {
-            foreach ($car['modifications'] as $modification) {
+        foreach ($data as $car_data) {
+            foreach ($car_data['modifications'] as $modification) {
                 if ($modification['complectation-id'] === $car->carbase_modification_id) {
                     return $modification;
                 }
