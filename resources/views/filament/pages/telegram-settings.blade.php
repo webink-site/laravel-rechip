@@ -6,8 +6,8 @@ $botInfo = $telegram->getMe();
 
 // Получение информации о webhook
 try {
-    $webhookInfoResponse = file_get_contents("https://api.telegram.org/bot" . config('telegram.bot_token') . "/getWebhookInfo");
-    $webhookInfo = json_decode($webhookInfoResponse, true);
+    $webhookInfoResponse = json_decode(file_get_contents("https://api.telegram.org/bot" . config('telegram.bot_token') . "/getWebhookInfo"), true);
+    $webhookInfo = $webhookInfoResponse['ok'] ? $webhookInfoResponse['result'] : $webhookInfoResponse;
 } catch (\Exception $e) {
     $webhookInfo = [];
 }
@@ -25,9 +25,9 @@ try {
                     <p>
                         <strong>Статус Webhook:</strong>
                         @if(isset($webhookInfo['url']) && !empty($webhookInfo['url']))
-                            <span class="text-green-600">• Активен</span>
+                            <span class="text-green-600" style="color:green">• Активен</span>
                         @else
-                            <span class="text-red-600">• Неактивен</span>
+                            <span class="text-red-600" style="color:red">• Неактивен</span>
                         @endif
                     </p>
                     <p>
@@ -63,7 +63,7 @@ try {
 
             {{ $this->form }}
 
-            <div class="flex justify-end mt-4">
+            <div class="flex justify-end mt-4" style="margin-top: 20px">
                 <x-filament::button type="submit" color="success" wire:click="saveSettings">
                     Сохранить Настройки
                 </x-filament::button>
