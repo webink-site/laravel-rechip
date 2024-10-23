@@ -65,7 +65,7 @@ class AutoController extends Controller
 
         // Формирование итогового ответа
         return response()->json([
-            'modification' => $car,
+            'modification' => $this->getModificationFromExternalApi($car),
             'services' => $services,
         ]);
     }
@@ -114,19 +114,16 @@ class AutoController extends Controller
     /**
      * Запрос к внешнему API для получения данных о модификации.
      *
-     * @param string $mark_id
-     * @param string $model_id
-     * @param string $generation_id
-     * @param string $product_id
+     * @param Auto $car
      * @return array|null
      */
-    private function getModificationFromExternalApi($mark_id, $model_id, $generation_id, $product_id)
+    private function getModificationFromExternalApi(Auto $car)
     {
         $base_url = 'https://cars-base.ru/api/cars';
         $api_key = 'd1e353ef7'; // API-ключ
 
         // Формируем URL для запроса к внешнему API
-        $url = "{$base_url}/" . urlencode($mark_id) . "/" . urlencode($model_id) . "/" . urlencode($generation_id) . "?key={$api_key}";
+        $url = "{$base_url}/" . urlencode($car->mark_id) . "/" . urlencode($car->model_id) . "/" . urlencode($car->generation_id) . "?key={$api_key}";
 
         // Выполняем HTTP-запрос
         $response = Http::get($url);
@@ -142,7 +139,7 @@ class AutoController extends Controller
         // Поиск модификации, соответствующей product_id
         foreach ($data as $car) {
             foreach ($car['modifications'] as $modification) {
-                if ($modification['complectation-id'] === $product_id) {
+                if ($modification['complectation-id'] === $car->carbase_modification_id) {
                     return $modification;
                 }
             }
