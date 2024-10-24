@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -14,33 +14,19 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Шаг 2: Установка Docker Buildx
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      # Шаг 3: Билд Docker-образа
-      - name: Build Docker image
-        run: |
-          docker build -t api-rechip-tuning:latest .
-      
-      # Шаг 4: Сохранение Docker-образа в tar-архив
-      - name: Save Docker image to tar
-        run: |
-          docker save api-rechip-tuning:latest -o api-rechip-tuning.tar
-
-      # Шаг 5: Передача tar-архива на сервер
-      - name: Upload Docker image to server
+      # Шаг 2: Копирование файлов проекта на сервер
+      - name: Upload project files to server
         uses: appleboy/scp-action@v0.1.5
         with:
           host: ${{ secrets.SERVER_IP }}
           username: ${{ secrets.SERVER_USER }}
           port: ${{ secrets.SSH_PORT }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "api-rechip-tuning.tar"
-          target: "/var/www/api.rechip-tuning.ru/api-rechip-tuning.tar"
+          source: "."
+          target: "/var/www/html/api.rechip-tuning.ru"
 
-      # Шаг 6: Выполнение команд на сервере
-      - name: Deploy Docker image on server
+      # Шаг 3: Выполнение команд на сервере
+      - name: Run deployment commands on server
         uses: appleboy/ssh-action@v0.1.5
         with:
           host: ${{ secrets.SERVER_IP }}
@@ -48,20 +34,24 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /var/www/api.rechip-tuning.ru
+            cd /var/www/html/api.rechip-tuning.ru
 
-            # Загрузка Docker-образа
-            docker load -i api-rechip-tuning.tar
+            # Установка зависимостей на сервере (устанавливает зависимости из composer.lock)
+            composer install --no-dev --optimize-autoloader
 
-            # Обновление docker-compose.yml (если требуется)
-            # rsync или другие команды для обновления конфигурации
+            # Выполнение миграций (если необходимо)
+            php artisan migrate --force
 
-            # Перезапуск контейнеров
-            docker-compose down
-            docker-compose up -d --no-deps --build
+            # Очистка и обновление кэшей
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
 
-            # Очистка tar-архива после загрузки
-            rm -f api-rechip-tuning.tar
+            # Установка правильных прав для директорий
+            chown -R www-data:www-data /var/www/html/api.rechip-tuning.ru
+            chmod -R 755 /var/www/html/api.rechip-tuning.ru
+            chmod -R 775 /var/www/html/api.rechip-tuning.ru/storage
+            chmod -R 775 /var/www/html/api.rechip-tuning.ru/bootstrap/cache
 
-            # Самоочистка Docker ресурсов
-            docker system prune -af
+            # Перезапуск PHP-FPM для версии 8.3
+            sudo systemctl restart php8.3-fpm
