@@ -53,5 +53,5 @@ jobs:
             chmod -R 775 /var/www/html/api.rechip-tuning.ru/storage
             chmod -R 775 /var/www/html/api.rechip-tuning.ru/bootstrap/cache
 
-            # Перезапуск PHP-FPM (если используется)
-            sudo systemctl restart php8.1-fpm
+            # Перезапуск PHP-FPM для версии 8.3
+            sudo systemctl restart php8.3-fpm
