@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Models\Auto;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 
 class AutoController extends Controller
 {
@@ -92,7 +93,7 @@ class AutoController extends Controller
                 'ID' => $service->id,
                 'name' => $service->service_name,
                 'description' => $service->description,
-                'image' => $service->image,
+                'image' => $service->image ? Storage::disk('public')->url($service->image) : null,
                 'price' => $service->pivot->price . ' ₽'
             ];
         })->toArray();
