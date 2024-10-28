@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ServiceResource\Pages;
 use App\Models\Service;
+use App\Models\ServiceSeoSetting;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -57,7 +58,7 @@ class ServiceResource extends Resource
                                             ]),
                                     ])
                             ])
-                        ->columns(2)
+                            ->columns(2)
                     ]),
                 Forms\Components\Grid::make(2)
                     ->schema([
@@ -66,6 +67,36 @@ class ServiceResource extends Resource
                         Forms\Components\FileUpload::make('image_wide')
                             ->label('Широкое изображение для заголовка страницы'),
                     ]),
+                Forms\Components\Grid::make(1)
+                    ->schema([
+                        // SEO-настройки для уровней услуги
+                        Forms\Components\Repeater::make('seoSettings')
+                            ->label('SEO-настройки')
+                            ->relationship('seoSettings') // Связь с моделью SEO-настроек
+                            ->schema([
+                                Forms\Components\Grid::make(1)
+                                    ->schema([
+                                        Forms\Components\Select::make('level')
+                                            ->label('Уровень')
+                                            ->options([
+                                                'Марка' => 'Марка',
+                                                'Модель' => 'Модель',
+                                                'Поколение' => 'Поколение',
+                                                'Модификация' => 'Модификация',
+                                            ])
+                                            ->required(),
+                                        Forms\Components\TextInput::make('title')
+                                            ->label('SEO Title')
+                                            ->hint('Используйте ${name} для имени товара и ${region} для региона')
+                                            ->required(),
+                                        Forms\Components\Textarea::make('description')
+                                            ->label('SEO Description')
+                                            ->hint('Используйте ${name} для имени товара и ${region} для региона')
+                                            ->required(),
+                                    ])
+                            ])
+                            ->columns(2)
+                    ])
             ]);
     }
 

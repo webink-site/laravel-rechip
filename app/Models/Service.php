@@ -31,4 +31,12 @@ class Service extends Model
     {
         return $this->belongsToMany(Auto::class, 'auto_service')->withPivot('price')->withTimestamps();
     }
+
+    /**
+     * SEO-настройки услуги.
+     */
+    public function seoSettings()
+    {
+        return $this->hasMany(ServiceSeoSetting::class);
+    }
 }

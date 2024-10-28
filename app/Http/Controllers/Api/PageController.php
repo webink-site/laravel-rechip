@@ -166,6 +166,7 @@ class PageController extends Controller
                $minimal_prices_new[] = $price;
             }
             $item->minimal_prices = $minimal_prices_new;
+            $item->seo_settings = $item->seoSettings;
         });
 
         return response()->json($services);
