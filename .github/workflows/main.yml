@@ -24,6 +24,9 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "."
           target: "/var/www/html/api.rechip-tuning.ru"
+          rm: false  # Не удалять файлы на сервере
+          excludes: |
+            storage/app/public
 
       # Шаг 3: Выполнение команд на сервере
       - name: Run deployment commands on server
