@@ -4,12 +4,15 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\PageResource\Pages;
 use App\Models\Page;
+use Closure;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use FilamentTiptapEditor\TiptapEditor;
+use Illuminate\Support\Facades\Storage;
 use PHPUnit\Metadata\Group;
 
 class PageResource extends Resource
@@ -60,6 +63,7 @@ class PageResource extends Resource
                             ->schema([
                                 Forms\Components\FileUpload::make('icon')
                                     ->label('Иконка (URL)')
+                                    ->disk('public') // Используем диск 'public'
                                     ->required(),
                                 Forms\Components\TextInput::make('header')
                                     ->label('Заголовок преимущества')
