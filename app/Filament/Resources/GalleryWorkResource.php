@@ -8,8 +8,13 @@ use Filament\Forms;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
 
 class GalleryWorkResource extends Resource
 {
@@ -68,12 +73,28 @@ class GalleryWorkResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('title')
-                    ->label('Название работы'),
+                    ->label('Название работы')
+                    ->searchable(), // Добавляем поиск по названию работы
                 TextColumn::make('content')
                     ->label('Описание работы'),
                 TextColumn::make('date')
                     ->label('Дата работы')
                     ->date(),
+            ])
+            ->filters([
+                // Фильтр по отсутствию фотографий
+                Filter::make('no_photos')
+                    ->label('Без фотографий')
+                    ->query(function ($query) {
+                        return $query->whereNull('gallery')->orWhere('gallery', '[]');
+                    }),
+            ])
+            ->actions([
+                EditAction::make(),
+                DeleteAction::make(),
+            ])
+            ->bulkActions([
+                DeleteBulkAction::make(),
             ]);
     }
 

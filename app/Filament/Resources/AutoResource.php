@@ -96,12 +96,12 @@ class AutoResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('auto_full_name')->label('Полное наименование авто'),
-                TextColumn::make('brand')->label('Марка авто'),
-                TextColumn::make('model')->label('Модель авто'),
-                TextColumn::make('generation')->label('Поколение авто'),
-                TextColumn::make('configuration')->label('Конфигурация авто'),
-                TextColumn::make('modification')->label('Модификация авто'),
+                TextColumn::make('auto_full_name')->label('Полное наименование авто')->searchable(),
+                TextColumn::make('brand')->label('Марка авто')->searchable(),
+                TextColumn::make('model')->label('Модель авто')->searchable(),
+                TextColumn::make('generation')->label('Поколение авто')->searchable(),
+                TextColumn::make('configuration')->label('Конфигурация авто')->searchable(),
+                TextColumn::make('modification')->label('Модификация авто')->searchable(),
             ])
             ->filters([]);
     }

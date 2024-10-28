@@ -7,6 +7,7 @@ use App\Models\TelegramRequest;
 use Filament\Forms;
 use Filament\Tables;
 use Filament\Resources\Resource;
+use Filament\Tables\Filters\SelectFilter;
 
 class TelegramRequestResource extends Resource
 {
@@ -56,12 +57,19 @@ class TelegramRequestResource extends Resource
                 Tables\Columns\TextColumn::make('created_at')->label('Дата создания')->dateTime()->sortable(),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('status')->options([
-                    'new' => 'Новая',
-                    'completed' => 'Обработана',
-                    'spam' => 'Спам',
-                    'error' => 'Ошибка',
-                ]),
+                SelectFilter::make('status')
+                    ->label('Фильтр по статусу')
+                    ->options([
+                        'new' => 'Новая',
+                        'completed' => 'Обработана',
+                        'spam' => 'Спам',
+                        'error' => 'Ошибка',
+                    ])
+                    ->default('new')
+                    ->query(function ($query, $state) {
+                        // Применяем фильтрацию к запросу на основе выбранного значения
+                        return $query->where('status', $state);
+                    }),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

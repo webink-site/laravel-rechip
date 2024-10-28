@@ -114,6 +114,7 @@ class PageController extends Controller
             foreach ($gallery as $image) {
                 $gallery_new[] = Storage::disk('public')->url($image);
             }
+
             return [
                 'id' => $item->id,
                 'title' => $item->title,
@@ -128,9 +129,13 @@ class PageController extends Controller
             ];
         });
 
+        $posts->filter(function ($item) {
+            return count($item['fields']['gallery']) != 0;
+        });
+
         return response()->json([
             'posts' => $posts,
-            'count' => $gallery->total(),
+            'count' => $posts->count(),
             'page' => $gallery->currentPage(),
             'size' => $gallery->perPage()
         ]);
