@@ -109,6 +109,11 @@ class PageController extends Controller
 
         // Формирование постов в нужном формате
         $posts = $gallery->map(function ($item) {
+            $gallery = $item->gallery;
+            $gallery_new = [];
+            foreach ($gallery as $image) {
+                $gallery_new[] = Storage::disk('public')->url($image);
+            }
             return [
                 'id' => $item->id,
                 'title' => $item->title,
@@ -117,7 +122,7 @@ class PageController extends Controller
                 'fields' => [
                     'power_points' => $item->power_points,
                     'tuning_profit' => $item->tuning_profit,
-                    'gallery' => $item->gallery,
+                    'gallery' => $gallery_new,
                     'product_id' => $item->auto_id ? [$item->auto_id] : [],
                 ]
             ];
@@ -151,6 +156,17 @@ class PageController extends Controller
     private function getServices()
     {
         $services = Service::all();
+
+        $services->each(function ($item) {
+            $item->image = $item->image ? Storage::disk('public')->url($item->image) : null;
+            $item->image_wide = $item->image_wide ? Storage::disk('public')->url($item->image_wide) : null;
+            $minimal_prices_new = [];
+            foreach($item->minimal_prices as $price){
+               $price['icon'] = $price['icon'] ? Storage::disk('public')->url($price['icon']) : null;
+               $minimal_prices_new[] = $price;
+            }
+            $item->minimal_prices = $minimal_prices_new;
+        });
 
         return response()->json($services);
     }
