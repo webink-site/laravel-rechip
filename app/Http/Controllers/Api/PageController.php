@@ -9,6 +9,7 @@ use App\Models\Contact;
 use App\Models\GalleryWork;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class PageController extends Controller
 {
@@ -64,7 +65,14 @@ class PageController extends Controller
             ], 404);
         }
 
-        return response()->json($page->content);
+        $page = $page->toArray();
+        if($page['title'] === 'Главная'){
+            for($i = 0; $i < count($page['content']['advantages']); $i++){
+                $page['content']['advantages'][$i]['icon'] = Storage::disk('public')->url($page['content']['advantages'][$i]['icon']);
+            }
+        }
+
+        return response()->json($page['content']);
     }
 
     /**

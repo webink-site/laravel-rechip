@@ -17,15 +17,4 @@ class EditPage extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
-
-    protected function mutateFormDataBeforeSave(array $data): array
-    {
-        if($data['title'] === 'Главная'){
-            for($i = 0; $i < count($data['content']['advantages']); $i++){
-                $data['content']['advantages'][$i]['icon'] = Storage::disk('public')->url($data['content']['advantages'][$i]['icon']);
-            }
-
-        }
-        return $data;
-    }
 }
