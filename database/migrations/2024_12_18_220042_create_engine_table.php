@@ -8,18 +8,18 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::create('services', function (Blueprint $table) {
+        Schema::create('engine', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 255)->unique();
-            $table->text('description')->nullable();
             $table->string('slug', 255)->unique();
-            $table->string('image', 255)->nullable();
+            $table->string('volume', 255)->nullable();
+            $table->integer('power');
+            $table->unique(['volume', 'power']);
             $table->timestamps();
         });
     }
 
     public function down()
     {
-        Schema::dropIfExists('services');
+        Schema::dropIfExists('engine');
     }
 };
