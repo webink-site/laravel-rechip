@@ -14,7 +14,7 @@ use Filament\Tables\Table;
 class SevicesRelationManager extends RelationManager
 {
     protected static string $relationship = 'services'; // Отношение 'services' в модели Aut
-    protected static ?string $recordTitleAttribute = 'service_name';
+    protected static ?string $recordTitleAttribute = 'name';
     protected static ?string $title = "Услуги";
     protected static ?string $label = "услугу";
     protected static ?string $pluralLabel = "услуги";
@@ -25,7 +25,7 @@ class SevicesRelationManager extends RelationManager
             ->schema([
                 Forms\Components\Select::make('service_id')
                     ->label('Услуга')
-                    ->options(Service::all()->pluck('service_name', 'id')) // Вывод всех доступных услуг
+                    ->options(Service::all()->pluck('name', 'id')) // Вывод всех доступных услуг
                     ->required(),
                 Forms\Components\TextInput::make('pivot.price')
                     ->label('Цена услуги')
@@ -38,7 +38,7 @@ class SevicesRelationManager extends RelationManager
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('service_name')
+                Tables\Columns\TextColumn::make('name')
                     ->label('Название услуги'),
                 Tables\Columns\TextColumn::make('pivot.price')
                     ->label('Цена услуги'),
@@ -51,7 +51,7 @@ class SevicesRelationManager extends RelationManager
                     ->form([
                         Forms\Components\Select::make('service_id')
                             ->label('Услуга')
-                            ->options(Service::all()->pluck('service_name', 'id')) // Список существующих услуг
+                            ->options(Service::all()->pluck('name', 'id')) // Список существующих услуг
                             ->searchable()
                             ->required(),
 

@@ -10,7 +10,7 @@ class Service extends Model
     use HasFactory;
 
     protected $fillable = [
-        'service_name',
+        'name',
         'slug',
         'short_description',
         'description',
