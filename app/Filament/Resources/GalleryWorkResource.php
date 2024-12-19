@@ -59,7 +59,7 @@ class GalleryWorkResource extends Resource
                             ->required(),
 
                         // Поле для выбора автомобиля
-                        Forms\Components\Select::make('auto_id')
+                        Forms\Components\Select::make('catalog_id')
                             ->label('Автомобиль')
                             ->relationship('auto', 'auto_full_name') // Связываем с моделью Auto и выводим имя автомобиля
                             ->searchable() // Добавляем возможность поиска

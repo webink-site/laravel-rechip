@@ -14,7 +14,7 @@ class GalleryWork extends Model
         'power_points',
         'tuning_profit',
         'gallery',
-        'auto_id', // Связь с автомобилем
+        'catalog_id', // Связь с автомобилем
     ];
 
     protected $casts = [

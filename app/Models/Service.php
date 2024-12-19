@@ -26,11 +26,19 @@ class Service extends Model
     ];
 
     /**
-     * Автомобили, связанные с услугой
+     * Каталоги, связанные с услугой
      */
-    public function autos()
+    public function catalogs()
     {
-        return $this->belongsToMany(Auto::class, 'auto_service')->withPivot('price')->withTimestamps();
+        return $this->hasMany(Catalog::class, 'service_id');
+    }
+
+    /**
+     * Дополнительные услуги в каталоге
+     */
+    public function catalogOptionalServices()
+    {
+        return $this->hasMany(CatalogOptionalService::class, 'service_id');
     }
 
     /**

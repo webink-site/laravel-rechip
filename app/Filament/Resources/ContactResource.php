@@ -48,7 +48,7 @@ class ContactResource extends Resource
                     ->required(),
 
                 // Поле для социальных ссылок
-                Forms\Components\Repeater::make('social_links')
+                Forms\Components\Section::make('social_links')
                     ->label('Социальные ссылки')
                     ->schema([
                         Forms\Components\TextInput::make('telegram')

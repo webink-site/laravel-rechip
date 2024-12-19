@@ -63,7 +63,7 @@ class SevicesRelationManager extends RelationManager
                     ])
                     ->mutateFormDataUsing(function (array $data): array {
                         // Добавляем auto_id в данные, чтобы создать связь
-                        $data['auto_id'] = $this->ownerRecord->id; // Получаем id автомобиля
+                        $data['catalog_id'] = $this->ownerRecord->id; // Получаем id автомобиля
                         return $data;
                     })
                     ->action(function (array $data) {

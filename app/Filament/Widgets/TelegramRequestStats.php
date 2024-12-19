@@ -13,8 +13,6 @@ use Filament\Forms\Components\DatePicker;
 
 class TelegramRequestStats extends BaseWidget
 {
-    protected static ?string $heading = 'Статистика заявок';
-
     protected function getCards(): array
     {
         return [

@@ -124,7 +124,7 @@ class PageController extends Controller
                     'power_points' => $item->power_points,
                     'tuning_profit' => $item->tuning_profit,
                     'gallery' => $gallery_new,
-                    'product_id' => $item->auto_id ? [$item->auto_id] : [],
+                    'product_id' => $item->catalog_id ? [$item->catalog_id] : [],
                 ]
             ];
         });
