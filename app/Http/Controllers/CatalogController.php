@@ -77,7 +77,7 @@ class CatalogController extends Controller
                 // Только service - возвращаем список брендов
                 $brands = Brand::whereHas('catalogs', function ($query) use ($service) {
                     $query->where('service_id', $service->id);
-                })->get(['name','slug']);
+                })->get(['name','slug','catalog_image']);
 
                 return response()->json($brands);
 
@@ -95,7 +95,7 @@ class CatalogController extends Controller
                 $models = CarModel::whereHas('catalogs', function ($query) use ($service, $brand) {
                     $query->where('service_id', $service->id)
                         ->where('brand_id', $brand->id);
-                })->get(['name','slug']);
+                })->get(['name','slug','catalog_image']);
 
                 return response()->json($models);
 
