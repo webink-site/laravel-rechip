@@ -12,7 +12,7 @@ class CarModel extends Model
     // Указываем, если таблица называется 'models' или другое
     protected $table = 'models';
 
-    protected $fillable = ['name', 'slug'];
+    protected $fillable = ['name', 'slug', 'catalog_image'];
 
     public function catalogs()
     {

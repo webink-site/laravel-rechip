@@ -30,6 +30,13 @@ class CarModelResource extends Resource
                     ->required()
                     ->unique(CarModel::class, 'slug', ignoreRecord: true)
                     ->maxLength(255),
+                Forms\Components\FileUpload::make('catalog_image')
+                    ->label('Изображение модели')
+                    ->image() // Указывает, что это загрузка изображения
+                    ->directory('models') // Каталог для хранения изображений
+                    ->required() // Поле обязательно
+                    ->maxSize(5120) // Максимальный размер файла в КБ (5 MB)
+                    ->imagePreviewHeight('150'), // Высота предпросмотра изображения
             ]);
     }
 
@@ -39,6 +46,9 @@ class CarModelResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('slug')->sortable()->searchable(),
+                Tables\Columns\ImageColumn::make('catalog_image')
+                    ->label('Изображение') // Отображает изображение в таблице
+                    ->square(),
                 Tables\Columns\TextColumn::make('catalogs_count')
                     ->counts('catalogs')
                     ->label('Количество каталогов'),
