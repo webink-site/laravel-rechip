@@ -44,6 +44,7 @@ class CatalogResource extends JsonResource
             'service_main_price' => $this->service_main_price,
             'chip_tuning_param' => $this->chipTuningParam, // Можно также создать ресурс для этого, если нужно
             'optional_services' => OptionalServiceResource::collection($this->catalogOptionalServices),
+            'work_gallery' => $this->gallery
         ];
     }
 }

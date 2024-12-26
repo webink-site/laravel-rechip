@@ -56,4 +56,9 @@ class Catalog extends Model
     {
         return $this->hasMany(CatalogOptionalService::class);
     }
+
+    public function gallery()
+    {
+        return $this->hasMany(GalleryWork::class);
+    }
 }
