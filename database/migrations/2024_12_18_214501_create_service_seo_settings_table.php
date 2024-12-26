@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('catalog_seo_settings', function (Blueprint $table) {
+        Schema::create('service_seo_settings', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('catalog_id');
+            $table->bigInteger('service_id');
             $table->string('level');
             $table->string('title')->nullable();
             $table->text('description')->nullable();

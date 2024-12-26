@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class GalleryWork extends Model
 {
@@ -21,9 +21,8 @@ class GalleryWork extends Model
         'gallery' => 'array',
     ];
 
-    // Связь с автомобилем
-    public function auto()
+    public function catalog(): BelongsTo
     {
-        return $this->belongsTo(Auto::class);
+        return $this->belongsTo(Catalog::class);
     }
 }

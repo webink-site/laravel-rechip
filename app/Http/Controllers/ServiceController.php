@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ServiceResource;
 use App\Models\Service;
 use Illuminate\Http\JsonResponse;
 
@@ -14,36 +15,12 @@ class ServiceController extends Controller
      */
     public function index(): JsonResponse
     {
-        // Получение всех услуг
-        $services = Service::all();
+        // Получение всех услуг с SEO-настройками
+        $services = Service::with(["seoSettings"])->get();
 
         return response()->json([
             'success' => true,
-            'data' => $services,
-        ]);
-    }
-
-    /**
-     * Получить детали конкретной услуги.
-     *
-     * @param int $id
-     * @return JsonResponse
-     */
-    public function show(int $id): JsonResponse
-    {
-        // Получение услуги по ID с связанными каталогами
-        $service = Service::with(['catalogs'])->find($id);
-
-        if (!$service) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Услуга не найдена.',
-            ], 404);
-        }
-
-        return response()->json([
-            'success' => true,
-            'data' => $service,
+            'data'    => ServiceResource::collection($services),
         ]);
     }
 }

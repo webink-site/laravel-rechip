@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ServiceResource\Pages;
+use App\Filament\Resources\ServiceResource\RelationManagers\ServiceSeoSettingsRelationManager;
 use App\Models\Service;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -47,7 +48,6 @@ class ServiceResource extends Resource
                     ->directory('services/images_wide')
                     ->nullable(),
                 Forms\Components\Repeater::make('minimal_prices')
-                    ->relationship()
                     ->schema([
                         Forms\Components\TextInput::make('price_type')
                             ->required()
@@ -90,7 +90,7 @@ class ServiceResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            ServiceSeoSettingsRelationManager::class,
         ];
     }
 

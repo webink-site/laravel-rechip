@@ -12,40 +12,27 @@ class Service extends Model
     protected $fillable = [
         'name',
         'slug',
-        'short_description',
         'description',
+        'short_description',
         'post_title',
         'page_content',
         'image',
         'image_wide',
         'minimal_prices',
+        // Добавьте остальные поля по необходимости
     ];
 
     protected $casts = [
-        'minimal_prices' => 'array',
+        'minimal_prices' => 'array', // Приведение к массиву
     ];
 
     /**
-     * Каталоги, связанные с услугой
-     */
-    public function catalogs()
-    {
-        return $this->hasMany(Catalog::class, 'service_id');
-    }
-
-    /**
-     * Дополнительные услуги в каталоге
-     */
-    public function catalogOptionalServices()
-    {
-        return $this->hasMany(CatalogOptionalService::class, 'service_id');
-    }
-
-    /**
-     * SEO-настройки услуги.
+     * Получить SEO-настройки для сервиса.
      */
     public function seoSettings()
     {
         return $this->hasMany(ServiceSeoSetting::class);
     }
+
+    // Остальные методы и отношения модели
 }
