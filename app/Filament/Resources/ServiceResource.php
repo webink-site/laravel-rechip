@@ -55,6 +55,10 @@ class ServiceResource extends Resource
                         Forms\Components\TextInput::make('price')
                             ->required()
                             ->numeric(),
+                        Forms\Components\FileUpload::make('icon') // Новое поле для иконки
+                        ->image()
+                            ->directory('services/minimal_prices/icons') // Укажите директорию по вашему усмотрению
+                            ->nullable(),
                     ])
                     ->defaultItems(1)
                     ->required(),

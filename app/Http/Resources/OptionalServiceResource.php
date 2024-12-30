@@ -23,7 +23,9 @@ class OptionalServiceResource extends JsonResource
                 "name" => $this->service->name,
                 "short_description" => $this->service->short_description,
                 "image" => $this->service->image
-            ]
+            ],
+            'main_price' => $this->main_price,
+            'sale_price' => $this->sale_price
         ];
     }
 }
