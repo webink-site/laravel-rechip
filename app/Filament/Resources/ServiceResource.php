@@ -25,17 +25,13 @@ class ServiceResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
-                    ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('slug')
-                    ->required()
                     ->unique(Service::class, 'slug', ignoreRecord: true)
                     ->maxLength(255),
                 Forms\Components\Textarea::make('short_description')
-                    ->required()
                     ->maxLength(65535),
-                Forms\Components\Textarea::make('description')
-                    ->required(),
+                Forms\Components\Textarea::make('description'),
                 Forms\Components\TextInput::make('post_title')
                     ->maxLength(255),
                 Forms\Components\Textarea::make('page_content'),
@@ -59,9 +55,7 @@ class ServiceResource extends Resource
                         ->image()
                             ->directory('services/minimal_prices/icons') // Укажите директорию по вашему усмотрению
                             ->nullable(),
-                    ])
-                    ->defaultItems(1)
-                    ->required(),
+                    ]),
             ]);
     }
 
