@@ -10,6 +10,7 @@ class TelegramUser extends Model
     use HasFactory;
 
     protected $fillable = [
+        'user_id',
         'username',
         'first_name',
         'last_name',
