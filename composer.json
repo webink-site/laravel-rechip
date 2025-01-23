@@ -11,7 +11,8 @@
         "filament/filament": "^3.2",
         "irazasyed/telegram-bot-sdk": "^3.14",
         "laravel/framework": "^11.9",
-        "laravel/tinker": "^2.9"
+        "laravel/tinker": "^2.9",
+        "spatie/laravel-sitemap": "^7.3"
     },
     "require-dev": {
         "doctrine/dbal": "^4.2",

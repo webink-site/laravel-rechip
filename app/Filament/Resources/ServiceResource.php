@@ -34,7 +34,10 @@ class ServiceResource extends Resource
                 Forms\Components\Textarea::make('description'),
                 Forms\Components\TextInput::make('post_title')
                     ->maxLength(255),
-                Forms\Components\Textarea::make('page_content'),
+                Forms\Components\Grid::make(1)
+                    ->schema([
+                        Forms\Components\RichEditor::make('page_content'),
+                    ]),
                 Forms\Components\FileUpload::make('image')
                     ->image()
                     ->directory('services/images')
