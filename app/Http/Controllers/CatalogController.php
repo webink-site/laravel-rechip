@@ -121,6 +121,16 @@ class CatalogController extends Controller
                         ->where('model_id', $model->id);
                 })->get(['name','slug']);
 
+                if($configurations->isEmpty()) {
+                    $engines = Engine::whereHas('catalogs', function ($query) use ($service, $brand, $model) {
+                        $query->where('service_id', $service->id)
+                            ->where('brand_id', $brand->id)
+                            ->where('model_id', $model->id);
+                    })->get(['slug', 'volume', 'power']);
+
+                    return response()->json($engines);
+                }
+
                 return response()->json($configurations);
 
             case 3:
