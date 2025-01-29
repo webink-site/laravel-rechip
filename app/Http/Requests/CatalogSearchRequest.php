@@ -58,7 +58,6 @@ class CatalogSearchRequest extends FormRequest
             'configuration' => [
                 'nullable',
                 'string',
-                'exists:configuration,slug',
                 function ($attribute, $value, $fail) {
                     if ($this->missing('catalog') &&
                         (!$this->input('brand') && !$this->input('model') && !$this->input('configuration') && !$this->input('engine'))) {
