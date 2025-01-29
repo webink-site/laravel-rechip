@@ -205,7 +205,7 @@ class CatalogController extends Controller
                     ->where('service_id', $service->id)
                     ->where('brand_id', $brand->id)
                     ->where('model_id', $model->id)
-                    ->where('configuration_id', $configuration->id)
+                    ->where('configuration_id', $configuration?->id)
                     ->where('engine_id', $engine->id)
                     ->first();
 
