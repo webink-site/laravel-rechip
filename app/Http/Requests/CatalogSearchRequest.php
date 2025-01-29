@@ -16,7 +16,7 @@ class CatalogSearchRequest extends FormRequest
             // Вариант 1: Полный фильтр
             'brand' => 'nullable|string|exists:brands,slug',
             'model' => 'nullable|string|exists:models,slug',
-            'configuration' => 'nullable|string|exists:configuration,slug',
+            'configuration' => 'nullable|string',
             'engine' => 'nullable|string|exists:engine,slug',
 
             // Вариант 2: Только service и catalog

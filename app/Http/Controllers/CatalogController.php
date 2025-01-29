@@ -152,7 +152,7 @@ class CatalogController extends Controller
 
                 $configuration = Configuration::where('slug', $configuration_slug)->first();
                 if (!$configuration) {
-                    return response()->json(['error' => 'Конфигурация не найдена.'], 500);
+                    return response()->json(['error' => 'Конфигурация не найдена.'], 404);
                 }
 
                 $engines = Engine::whereHas('catalogs', function ($query) use ($service, $brand, $model, $configuration) {
