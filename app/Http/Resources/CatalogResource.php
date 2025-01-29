@@ -33,8 +33,8 @@ class CatalogResource extends JsonResource
                 'catalog_image' => $this->carModel->catalog_image,
             ],
             'configuration' => [
-                'name' => $this->configuration->name,
-                'slug' => $this->configuration->slug,
+                'name' => $this->configuration?->name,
+                'slug' => $this->configuration?->slug,
             ],
             'engine' => [
                 'slug' => $this->engine->slug,
