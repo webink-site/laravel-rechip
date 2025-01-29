@@ -71,6 +71,7 @@ class CatalogController extends Controller
         if ($model_slug) $filterLevel++;
         if ($configuration_slug) $filterLevel++;
         if ($engine_slug) $filterLevel++;
+        if ($engine_slug && !$configuration_slug) $filterLevel++;
 
         switch ($filterLevel) {
             case 0:
@@ -179,9 +180,12 @@ class CatalogController extends Controller
                     return response()->json(['error' => 'Модель не найдена.'], 404);
                 }
 
-                $configuration = Configuration::where('slug', $configuration_slug)->first();
-                if (!$configuration) {
-                    return response()->json(['error' => 'Конфигурация не найдена.'], 404);
+                $configuration = null;
+                if($configuration_slug){
+                    $configuration = Configuration::where('slug', $configuration_slug)->first();
+                    if (!$configuration) {
+                        return response()->json(['error' => 'Конфигурация не найдена.'], 404);
+                    }
                 }
 
                 $engine = Engine::where('slug', $engine_slug)->first();
