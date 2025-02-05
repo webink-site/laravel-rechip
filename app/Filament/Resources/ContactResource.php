@@ -60,6 +60,9 @@ class ContactResource extends Resource
                         Forms\Components\TextInput::make('social_links.avito')
                             ->label('Avito')
                             ->url(),
+                        Forms\Components\TextInput::make('social_links.vk')
+                            ->label('VK')
+                            ->url(),
                     ]),
 
                 // Юридическая информация
