@@ -52,6 +52,9 @@ class CatalogResource extends Resource
                 Forms\Components\TextInput::make('service_main_price')
                     ->required()
                     ->numeric(),
+                Forms\Components\TextInput::make('service_sale_price')
+                    ->required()
+                    ->numeric(),
                 Forms\Components\Repeater::make('chipTuningParam')
                     ->relationship()
                     ->schema([

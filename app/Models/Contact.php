@@ -15,13 +15,20 @@ class Contact extends Model
         'work_time',
         'coordinates',
         'social_links',
-        'legal_info',
+        // Удаляем 'legal_info' и добавляем новые поля
+        'organization_name',
+        'inn',
+        'ogrnip',
+        'legal_address',
         'url',
     ];
 
-    // Приводим поля social_links и legal_info к массиву, так как они будут храниться в формате JSON
     protected $casts = [
         'social_links' => 'array',
-        'legal_info' => 'array',
     ];
+
+    public function addresses()
+    {
+        return $this->hasMany(Address::class);
+    }
 }

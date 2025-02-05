@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ContactResource\Pages;
+use App\Filament\Resources\ContactResource\RelationManagers;
 use App\Models\Contact;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -15,10 +16,11 @@ class ContactResource extends Resource
 {
     protected static ?string $model = Contact::class;
     protected static ?string $navigationIcon = 'heroicon-o-phone';
-    protected static ?string $modelLabel = "Контакты";
+    protected static ?string $modelLabel = "Контакт";
     protected static ?string $pluralModelLabel = "Контакты";
     protected static ?string $navigationGroup = 'Информация';
     protected static ?int $navigationSort = 1;
+
     public static function form(Form $form): Form
     {
         return $form
@@ -31,77 +33,59 @@ class ContactResource extends Resource
                     ->label('Название региона')
                     ->required(),
 
-                Forms\Components\TextInput::make('address')
-                    ->label('Адрес')
-                    ->required(),
-
-                Forms\Components\TextInput::make('phone_number')
-                    ->label('Номер телефона')
-                    ->required(),
-
-                Forms\Components\TextInput::make('work_time')
-                    ->label('Время работы')
-                    ->required(),
-
-                Forms\Components\TextInput::make('coordinates')
-                    ->label('Координаты (широта, долгота)')
+                Forms\Components\TextInput::make('url')
+                    ->label('URL региона')
+                    ->url()
                     ->required(),
 
                 // Поле для социальных ссылок
                 Forms\Components\Section::make('social_links')
                     ->label('Социальные ссылки')
                     ->schema([
-                        Forms\Components\TextInput::make('telegram')
+                        Forms\Components\TextInput::make('social_links.telegram')
                             ->label('Telegram')
                             ->url(),
-                        Forms\Components\TextInput::make('whatsapp')
+                        Forms\Components\TextInput::make('social_links.whatsapp')
                             ->label('WhatsApp')
                             ->url(),
-                        Forms\Components\TextInput::make('telegram_channel')
+                        Forms\Components\TextInput::make('social_links.telegram_channel')
                             ->label('Telegram канал')
                             ->url(),
-                        Forms\Components\TextInput::make('youtube')
+                        Forms\Components\TextInput::make('social_links.youtube')
                             ->label('YouTube')
                             ->url(),
-                        Forms\Components\TextInput::make('drive2')
+                        Forms\Components\TextInput::make('social_links.drive2')
                             ->label('Drive2')
                             ->url(),
-                        Forms\Components\TextInput::make('avito')
+                        Forms\Components\TextInput::make('social_links.avito')
                             ->label('Avito')
                             ->url(),
                     ]),
 
-                // Поле для юридической информации
-                Forms\Components\Repeater::make('legal_info')
+                // Юридическая информация
+                Forms\Components\Section::make('legal_info')
                     ->label('Юридическая информация')
                     ->schema([
+                        Forms\Components\TextInput::make('organization_name')
+                            ->label('Название организации')
+                            ->required()
+                            ->default('ИП Кубашичев Тимур Нурбиевич'),
+
                         Forms\Components\TextInput::make('inn')
                             ->label('ИНН')
-                            ->required(),
-                        Forms\Components\TextInput::make('kpp')
-                            ->label('КПП')
-                            ->required(),
-                        Forms\Components\TextInput::make('ogrn')
-                            ->label('ОГРН')
-                            ->required(),
+                            ->required()
+                            ->default('502988216808'),
+
+                        Forms\Components\TextInput::make('ogrnip')
+                            ->label('ОГРНИП')
+                            ->required()
+                            ->default('324508100060659'),
+
                         Forms\Components\TextInput::make('legal_address')
                             ->label('Юридический адрес')
-                            ->required(),
-                        Forms\Components\TextInput::make('phisical_address')
-                            ->label('Физический адрес')
-                            ->required(),
-                        Forms\Components\TextInput::make('general_director')
-                            ->label('Генеральный директор')
-                            ->required(),
-                        Forms\Components\Textarea::make('footer_tiny_text')
-                            ->label('Текст в подвале')
-                            ->required(),
+                            ->required()
+                            ->default('Московская область, город Мытищи'),
                     ]),
-
-                Forms\Components\TextInput::make('url')
-                    ->label('URL региона')
-                    ->url()
-                    ->required(),
             ]);
     }
 
@@ -111,13 +95,17 @@ class ContactResource extends Resource
             ->columns([
                 TextColumn::make('region_code')->label('Код региона'),
                 TextColumn::make('region_name')->label('Название региона'),
-                TextColumn::make('address')->label('Адрес'),
-                TextColumn::make('phone_number')->label('Номер телефона'),
-                TextColumn::make('work_time')->label('Время работы'),
             ])
             ->bulkActions([
                 DeleteBulkAction::make()
             ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            RelationManagers\AddressesRelationManager::class,
+        ];
     }
 
     public static function getPages(): array
