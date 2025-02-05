@@ -10,12 +10,7 @@ class Contact extends Model
     protected $fillable = [
         'region_code',
         'region_name',
-        'address',
-        'phone_number',
-        'work_time',
-        'coordinates',
         'social_links',
-        // Удаляем 'legal_info' и добавляем новые поля
         'organization_name',
         'inn',
         'ogrnip',

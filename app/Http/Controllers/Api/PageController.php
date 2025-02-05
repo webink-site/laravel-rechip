@@ -148,7 +148,8 @@ class PageController extends Controller
      */
     private function getContacts()
     {
-        $contacts = Contact::all();
+        // Используем жадную загрузку для связи 'addresses'
+        $contacts = Contact::with('addresses')->get();
 
         return response()->json($contacts);
     }
