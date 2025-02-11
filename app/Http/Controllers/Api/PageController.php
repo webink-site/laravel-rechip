@@ -177,4 +177,34 @@ class PageController extends Controller
 
         return response()->json($services);
     }
+
+    // Выдает содержимое robots.txt как plain text
+    public function robots()
+    {
+        $page = Page::where('slug', 'robots.txt')->first();
+        $content = $page ? $page->content : "User-agent: *\nDisallow:";
+        return response($content, 200, [
+            'Content-Type' => 'text/plain; charset=UTF-8',
+        ]);
+    }
+
+    // Выдает публичную офферту как HTML
+    public function offer()
+    {
+        $page = Page::where('slug', 'offer')->first();
+        $content = $page ? $page->content : "<h1>Публичная офферта</h1><p>Контент не найден.</p>";
+        return response($content, 200, [
+            'Content-Type' => 'text/html; charset=UTF-8',
+        ]);
+    }
+
+    // Выдает пользовательское соглашение как HTML
+    public function terms()
+    {
+        $page = Page::where('slug', 'terms')->first();
+        $content = $page ? $page->content : "<h1>Пользовательское соглашение</h1><p>Контент не найден.</p>";
+        return response($content, 200, [
+            'Content-Type' => 'text/html; charset=UTF-8',
+        ]);
+    }
 }

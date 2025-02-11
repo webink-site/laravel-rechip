@@ -19,3 +19,7 @@ Route::get('/services', [ServiceController::class, 'index']);
 
 Route::get('/catalog', [CatalogController::class, 'search']);
 
+Route::get('/robots.txt', [PageController::class, 'robots']);
+Route::get('/offer', [PageController::class, 'offer']);
+Route::get('/terms', [PageController::class, 'terms']);
+
