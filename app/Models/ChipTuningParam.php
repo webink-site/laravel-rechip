@@ -10,6 +10,7 @@ class ChipTuningParam extends Model
     use HasFactory;
 
     protected $table = 'chip_tuning_params';
+    public $timestamps = false;
 
     protected $fillable = [
         'catalog_id',
