@@ -9,6 +9,8 @@ class CatalogOptionalService extends Model
 {
     use HasFactory;
 
+    public $timestamps = false;
+
     protected $fillable = [
         'catalog_id',
         'service_id',
