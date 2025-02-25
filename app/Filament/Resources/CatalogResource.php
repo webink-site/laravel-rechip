@@ -50,10 +50,8 @@ class CatalogResource extends Resource
                     ->required()
                     ->searchable(),
                 Forms\Components\TextInput::make('service_main_price')
-                    ->required()
                     ->numeric(),
                 Forms\Components\TextInput::make('service_sale_price')
-                    ->required()
                     ->numeric(),
                 Forms\Components\Repeater::make('chipTuningParam')
                     ->relationship()
