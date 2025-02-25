@@ -43,7 +43,6 @@ class CatalogResource extends Resource
                     ->searchable(),
                 Forms\Components\TextInput::make('slug')
                     ->required()
-                    ->unique(Catalog::class, 'slug', ignoreRecord: true)
                     ->maxLength(255),
                 Forms\Components\Select::make('service_id')
                     ->relationship('service', 'name')
