@@ -79,8 +79,7 @@ class CatalogResource extends Resource
                             ->nullable(),
                     ])
                     ->columns(2)
-                    ->createItemButtonLabel('Добавить параметры чип-тюнинга')
-                    ->required(),
+                    ->createItemButtonLabel('Добавить параметры чип-тюнинга'),
                 Forms\Components\Repeater::make('catalogOptionalServices')
                     ->relationship()
                     ->schema([
