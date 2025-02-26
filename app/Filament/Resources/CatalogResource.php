@@ -35,7 +35,6 @@ class CatalogResource extends Resource
                     ->searchable(),
                 Forms\Components\Select::make('configuration_id')
                     ->relationship('configuration', 'name')
-                    ->required()
                     ->searchable(),
                 Forms\Components\Select::make('engine_id')
                     ->relationship('engine', 'slug') // или другое поле, которое удобно
@@ -87,7 +86,6 @@ class CatalogResource extends Resource
                             ->required()
                             ->searchable(),
                         Forms\Components\TextInput::make('main_price')
-                            ->required()
                             ->numeric(),
                         Forms\Components\TextInput::make('sale_price')
                             ->numeric()
