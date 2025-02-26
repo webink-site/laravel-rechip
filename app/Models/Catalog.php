@@ -11,6 +11,8 @@ class Catalog extends Model
 
     // Указываем правильное название таблицы
     protected $table = 'catalog';
+    public $timestamps = false;
+
 
     protected $fillable = [
         'brand_id',
