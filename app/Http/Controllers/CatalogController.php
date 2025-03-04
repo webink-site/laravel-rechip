@@ -78,7 +78,7 @@ class CatalogController extends Controller
                 // Только service - возвращаем список брендов
                 $brands = Brand::whereHas('catalogs', function ($query) use ($service) {
                     $query->where('service_id', $service->id);
-                })->get(['name','slug','catalog_image']);
+                })->get(['name', 'slug', 'catalog_image']);
 
                 return response()->json($brands);
 
@@ -96,12 +96,13 @@ class CatalogController extends Controller
                 $models = CarModel::whereHas('catalogs', function ($query) use ($service, $brand) {
                     $query->where('service_id', $service->id)
                         ->where('brand_id', $brand->id);
-                })->get(['name','slug','catalog_image']);
+                })->get(['name', 'slug', 'catalog_image']);
 
                 return response()->json($models);
 
             case 2:
-                // service + brand + model - возвращаем список конфигураций
+                // service + brand + model - возвращаем список конфигураций.
+                // Если у записей каталога отсутствует configuration_id, возвращаем данные по двигателям.
                 if (!$model_slug) {
                     return response()->json(['error' => 'Необходима модель для получения конфигураций.'], 400);
                 }
@@ -116,23 +117,44 @@ class CatalogController extends Controller
                     return response()->json(['error' => 'Модель не найдена.'], 404);
                 }
 
+                // Получаем конфигурации по записям каталога, где configuration_id заполнена
                 $configurations = Configuration::whereHas('catalogs', function ($query) use ($service, $brand, $model) {
                     $query->where('service_id', $service->id)
                         ->where('brand_id', $brand->id)
-                        ->where('model_id', $model->id);
-                })->get(['name','slug']);
+                        ->where('model_id', $model->id)
+                        ->whereNotNull('configuration_id');
+                })->get(['name', 'slug']);
 
-                if($configurations->isEmpty()) {
-                    $engines = Engine::whereHas('catalogs', function ($query) use ($service, $brand, $model) {
-                        $query->where('service_id', $service->id)
-                            ->where('brand_id', $brand->id)
-                            ->where('model_id', $model->id);
-                    })->get(['slug', 'volume', 'power']);
+                // Получаем записи каталога, где configuration_id is null для получения информации по двигателям
+                $catalogsWithoutConfig = Catalog::with('engine')
+                    ->where('service_id', $service->id)
+                    ->where('brand_id', $brand->id)
+                    ->where('model_id', $model->id)
+                    ->whereNull('configuration_id')
+                    ->get();
 
-                    return response()->json($engines);
-                }
+                $engines = $catalogsWithoutConfig->pluck('engine')
+                    ->filter()
+                    ->unique('id');
 
-                return response()->json($configurations);
+                $engineItems = $engines->map(function ($engine) {
+                    return [
+                        'name' => $engine->volume . ' ' . $engine->power . ' л.с.',
+                        'slug' => $engine->slug,
+                    ];
+                });
+
+                $configItems = $configurations->map(function ($configuration) {
+                    return [
+                        'name' => $configuration->name,
+                        'slug' => $configuration->slug,
+                    ];
+                });
+
+                // Объединяем результаты из конфигураций и отсутствующих конфигураций (двигателей)
+                $result = $configItems->merge($engineItems);
+
+                return response()->json($result);
 
             case 3:
                 // service + brand + model + configuration - возвращаем список двигателей
@@ -152,7 +174,29 @@ class CatalogController extends Controller
 
                 $configuration = Configuration::where('slug', $configuration_slug)->first();
                 if (!$configuration) {
-                    return response()->json(['error' => 'Конфигурация не найдена.'], 404);
+                    $engine = Engine::where('slug', $configuration_slug)->first();
+                    if (!$engine) {
+                        return response()->json(['error' => 'Конфигурация не найдена.'], 404);
+                    }
+                    $catalog = Catalog::with([
+                        'brand',
+                        'carModel',
+                        'engine',
+                        'chipTuningParam',
+                        'catalogOptionalServices.service',
+                    ])
+                        ->where('service_id', $service->id)
+                        ->where('brand_id', $brand->id)
+                        ->where('model_id', $model->id)
+                        ->whereNull('configuration_id')
+                        ->where('engine_id', $engine->id)
+                        ->first();
+
+                    if (!$catalog) {
+                        return response()->json(['error' => 'Каталог не найден для предоставленных параметров.'], 404);
+                    }
+                    $resource = new CatalogResource($catalog);
+                    return response()->json($resource);
                 }
 
                 $engines = Engine::whereHas('catalogs', function ($query) use ($service, $brand, $model, $configuration) {
@@ -181,7 +225,7 @@ class CatalogController extends Controller
                 }
 
                 $configuration = null;
-                if($configuration_slug){
+                if ($configuration_slug) {
                     $configuration = Configuration::where('slug', $configuration_slug)->first();
                     if (!$configuration) {
                         return response()->json(['error' => 'Конфигурация не найдена.'], 404);
