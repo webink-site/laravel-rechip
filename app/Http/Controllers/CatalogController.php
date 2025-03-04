@@ -160,16 +160,25 @@ class CatalogController extends Controller
                 }
 
                 // Если конфигурации найдены, преобразуем их в структуру, идентичную структуре engine,
-                // но volume и power оставляем null
-                $configItems = $configurations->map(function ($configuration) {
+                // но с volume и power равными null. Кроме того, если slug конфигурации заканчивается на "-л-с",
+                // то в поле slug ответа кладем slug соответствующего engine.
+                $configItems = $configurations->map(function ($configuration) use ($service, $brand, $model) {
+                    $configuration_name = $configuration->name;
+                    if (preg_match('/-л-с$/u', $configuration->slug)) {
+                        $configuration_name = preg_replace('/\s+\S+\s+\S+$/u', '', $configuration->name);
+                    }
                     return [
                         'slug'   => $configuration->slug,
-                        'name'   => $configuration->name,
+                        'name'   => $configuration_name,
                     ];
                 });
 
-                // Объединяем результаты: сначала конфигурации, затем данные по двигателям
-                $result = $configItems->merge($engineItems);
+                // Объединяем результаты: сначала конфигурации, затем данные по двигателям, если таковые имеются
+                if ($engineItems->isNotEmpty()) {
+                    $result = $configItems->merge($engineItems);
+                } else {
+                    $result = $configItems;
+                }
 
                 return response()->json($result);
 
