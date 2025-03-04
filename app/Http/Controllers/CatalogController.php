@@ -164,8 +164,6 @@ class CatalogController extends Controller
                 $configItems = $configurations->map(function ($configuration) {
                     return [
                         'slug'   => $configuration->slug,
-                        'volume' => null,
-                        'power'  => null,
                         'name'   => $configuration->name,
                     ];
                 });
