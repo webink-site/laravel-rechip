@@ -125,30 +125,7 @@ class CatalogController extends Controller
                         ->whereNotNull('configuration_id');
                 })->get(['name', 'slug']);
 
-                if ($configurations->isEmpty()) {
-                    // Если конфигураций нет, ищем записи каталога с configuration_id = null для получения информации по двигателям
-                    $catalogsWithoutConfig = Catalog::with('engine')
-                        ->where('service_id', $service->id)
-                        ->where('brand_id', $brand->id)
-                        ->where('model_id', $model->id)
-                        ->whereNull('configuration_id')
-                        ->get();
-
-                    $engines = $catalogsWithoutConfig->pluck('engine')
-                        ->filter()
-                        ->unique('id');
-
-                    $engineItems = $engines->map(function ($engine) {
-                        return [
-                            'name' => $engine->volume . ' ' . $engine->power . ' л.с.',
-                            'slug' => $engine->slug,
-                        ];
-                    });
-
-                    return response()->json($engineItems);
-                }
-
-                // Если конфигурации найдены, дополнительно ищем записи каталога без конфигурации (для двигателей)
+                // Получаем записи каталога, где configuration_id = null для получения информации по двигателям
                 $catalogsWithoutConfig = Catalog::with('engine')
                     ->where('service_id', $service->id)
                     ->where('brand_id', $brand->id)
@@ -156,25 +133,44 @@ class CatalogController extends Controller
                     ->whereNull('configuration_id')
                     ->get();
 
-                $engines = $catalogsWithoutConfig->pluck('engine')
-                    ->filter()
-                    ->unique('id');
+                // Группируем каталоги по engine_id
+                $groupedCatalogs = $catalogsWithoutConfig->groupBy('engine_id');
 
-                $engineItems = $engines->map(function ($engine) {
+                $engineItems = $groupedCatalogs->map(function ($group) {
+                    $catalogRecord = $group->first();
+                    $engine = $catalogRecord->engine;
+                    if ($engine && $engine->volume !== null) {
+                        $computedName = $engine->volume . ' ' . $engine->power . ' л.с.';
+                    } else {
+                        // Если объем не заполнен, берем slug из каталога и преобразуем:
+                        $computedName = str_replace('l-s', 'л.с.', $catalogRecord->slug);
+                        $computedName = str_replace('-', ' ', $computedName);
+                    }
                     return [
-                        'name' => $engine->volume . ' ' . $engine->power . ' л.с.',
-                        'slug' => $engine->slug,
+                        'slug'   => $engine->slug,
+                        'volume' => ($engine && $engine->volume !== null) ? $engine->volume : null,
+                        'power'  => ($engine && $engine->power) ? $engine->power : null,
+                        'name'   => $computedName,
                     ];
-                });
+                })->values();
 
+                // Если не найдены конфигурации, сразу возвращаем данные по двигателям
+                if ($configurations->isEmpty()) {
+                    return response()->json($engineItems);
+                }
+
+                // Если конфигурации найдены, преобразуем их в структуру, идентичную структуре engine,
+                // но volume и power оставляем null
                 $configItems = $configurations->map(function ($configuration) {
                     return [
-                        'name' => $configuration->name,
-                        'slug' => $configuration->slug,
+                        'slug'   => $configuration->slug,
+                        'volume' => null,
+                        'power'  => null,
+                        'name'   => $configuration->name,
                     ];
                 });
 
-                // Объединяем результаты: записи с конфигурациями и данные по двигателям
+                // Объединяем результаты: сначала конфигурации, затем данные по двигателям
                 $result = $configItems->merge($engineItems);
 
                 return response()->json($result);
@@ -197,6 +193,8 @@ class CatalogController extends Controller
 
                 $configuration = Configuration::where('slug', $configuration_slug)->first();
                 if (!$configuration) {
+                    // Фолбэк: если конфигурация не найдена, ищем записи каталога,
+                    // где configuration_id = null, для бренда, модели и по двигателю (используем configuration_slug как slug двигателя)
                     $engine = Engine::where('slug', $configuration_slug)->first();
                     if (!$engine) {
                         return response()->json(['error' => 'Конфигурация не найдена.'], 404);
@@ -222,14 +220,33 @@ class CatalogController extends Controller
                     return response()->json($resource);
                 }
 
-                $engines = Engine::whereHas('catalogs', function ($query) use ($service, $brand, $model, $configuration) {
-                    $query->where('service_id', $service->id)
-                        ->where('brand_id', $brand->id)
-                        ->where('model_id', $model->id)
-                        ->where('configuration_id', $configuration->id);
-                })->get(['slug', 'volume', 'power']);
+                // Получаем записи каталога по заданной конфигурации
+                $catalogsForConfig = Catalog::with('engine')
+                    ->where('service_id', $service->id)
+                    ->where('brand_id', $brand->id)
+                    ->where('model_id', $model->id)
+                    ->where('configuration_id', $configuration->id)
+                    ->get();
 
-                return response()->json($engines);
+                $groupedCatalogs = $catalogsForConfig->groupBy('engine_id');
+                $engineItems = $groupedCatalogs->map(function ($group) {
+                    $catalogRecord = $group->first();
+                    $engine = $catalogRecord->engine;
+                    if ($engine && $engine->volume !== null) {
+                        $computedName = $engine->volume . ' ' . $engine->power . ' л.с.';
+                    } else {
+                        $computedName = str_replace('l-s', 'л.с.', $catalogRecord->slug);
+                        $computedName = str_replace('-', ' ', $computedName);
+                    }
+                    return [
+                        'slug'   => $engine->slug,
+                        'volume' => ($engine && $engine->volume !== null) ? $engine->volume : null,
+                        'power'  => ($engine && $engine->power) ? $engine->power : null,
+                        'name'   => $computedName,
+                    ];
+                })->values();
+
+                return response()->json($engineItems);
 
             case 4:
                 // service + brand + model + configuration + engine - возвращаем детальный каталог
