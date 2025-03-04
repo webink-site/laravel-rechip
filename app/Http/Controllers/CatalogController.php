@@ -24,12 +24,12 @@ class CatalogController extends Controller
     public function search(CatalogSearchRequest $request): JsonResponse
     {
         // Получаем параметры из запроса
-        $service_slug = $request->input('service');
-        $catalog_slug = $request->input('catalog');
-        $brand_slug = $request->input('brand');
-        $model_slug = $request->input('model');
-        $configuration_slug = $request->input('configuration');
-        $engine_slug = $request->input('engine');
+        $service_slug        = $request->input('service');
+        $catalog_slug        = $request->input('catalog');
+        $brand_slug          = $request->input('brand');
+        $model_slug          = $request->input('model');
+        $configuration_slug  = $request->input('configuration');
+        $engine_slug         = $request->input('engine');
 
         // Находим услугу по слагу
         $service = Service::where('slug', $service_slug)->first();
@@ -102,7 +102,7 @@ class CatalogController extends Controller
 
             case 2:
                 // service + brand + model - возвращаем список конфигураций.
-                // Если у записей каталога отсутствует configuration_id, возвращаем данные по двигателям.
+                // Если для выбранной модели ни одной конфигурации не найдено, возвращаем сразу данные по двигателям.
                 if (!$model_slug) {
                     return response()->json(['error' => 'Необходима модель для получения конфигураций.'], 400);
                 }
@@ -125,7 +125,30 @@ class CatalogController extends Controller
                         ->whereNotNull('configuration_id');
                 })->get(['name', 'slug']);
 
-                // Получаем записи каталога, где configuration_id is null для получения информации по двигателям
+                if ($configurations->isEmpty()) {
+                    // Если конфигураций нет, ищем записи каталога с configuration_id = null для получения информации по двигателям
+                    $catalogsWithoutConfig = Catalog::with('engine')
+                        ->where('service_id', $service->id)
+                        ->where('brand_id', $brand->id)
+                        ->where('model_id', $model->id)
+                        ->whereNull('configuration_id')
+                        ->get();
+
+                    $engines = $catalogsWithoutConfig->pluck('engine')
+                        ->filter()
+                        ->unique('id');
+
+                    $engineItems = $engines->map(function ($engine) {
+                        return [
+                            'name' => $engine->volume . ' ' . $engine->power . ' л.с.',
+                            'slug' => $engine->slug,
+                        ];
+                    });
+
+                    return response()->json($engineItems);
+                }
+
+                // Если конфигурации найдены, дополнительно ищем записи каталога без конфигурации (для двигателей)
                 $catalogsWithoutConfig = Catalog::with('engine')
                     ->where('service_id', $service->id)
                     ->where('brand_id', $brand->id)
@@ -151,7 +174,7 @@ class CatalogController extends Controller
                     ];
                 });
 
-                // Объединяем результаты из конфигураций и отсутствующих конфигураций (двигателей)
+                // Объединяем результаты: записи с конфигурациями и данные по двигателям
                 $result = $configItems->merge($engineItems);
 
                 return response()->json($result);
@@ -258,9 +281,9 @@ class CatalogController extends Controller
                 }
 
                 // Готовим итоговый ответ с использованием CatalogResource и включаем optional_services внутри data
-                $response = new CatalogResource($catalog);
+                $resource = new CatalogResource($catalog);
 
-                return response()->json($response);
+                return response()->json($resource);
 
             default:
                 return response()->json(['error' => 'Неверная комбинация параметров.'], 400);
